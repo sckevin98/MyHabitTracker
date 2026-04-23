@@ -18,10 +18,6 @@ function Heatmap({ habit, weeks = 15, cellSize = 10, gap = 3, rounded = 2, dimEm
       const daysFromToday = (weeks - 1 - w) * 7 + (todayWd - d);
       if (daysFromToday < 0) continue; // future — leave blank
       const date = addDays(today, -daysFromToday);
-      if (habit.createdAt && date.getTime() < habit.createdAt - 86400000) {
-        // before habit creation — leave blank
-        continue;
-      }
       const lvl = completionLevel(habit, dateKey(date));
       cells.push({ w, d, lvl });
     }
