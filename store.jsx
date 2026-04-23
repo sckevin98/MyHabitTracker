@@ -56,87 +56,20 @@ function weekdayIndex(d) {
   return (d.getDay() + 6) % 7;
 }
 
-// ── seed data (for first-run) ────────────────────────────────────────────────
-function seededRandom(seed) {
-  let s = seed;
-  return () => {
-    s = (s * 9301 + 49297) % 233280;
-    return s / 233280;
-  };
-}
-
-function seedEntries(habitId, seed, density, target) {
-  const rand = seededRandom(seed);
-  const out = {};
-  const today = new Date();
-  // populate last 140 days
-  for (let i = 140; i >= 1; i--) {
-    const d = addDays(today, -i);
-    const r = rand();
-    const recency = (140 - i) / 140 * 0.15;
-    if (r < density + recency) {
-      // how many checks?
-      const checks = target > 1
-        ? Math.min(target, 1 + Math.floor(rand() * target))
-        : 1;
-      out[dateKey(d)] = checks;
-    }
-  }
-  return out;
-}
-
-function defaultHabits() {
-  return [
-    {
-      id: 'gym', name: 'Gym', icon: '🏋', color: '#f97316',
-      category: 'Fitness', target: 1, targetUnit: 'times',
-      schedule: [0,2,3,5], createdAt: Date.now() - 90*86400000,
-      entries: seedEntries('gym', 11, 0.45, 1),
-    },
-    {
-      id: 'journaling', name: 'Journaling', icon: '📓', color: '#a855f7',
-      category: 'Mind', target: 1, targetUnit: 'entry',
-      schedule: [0,1,2,3,4,5,6], createdAt: Date.now() - 80*86400000,
-      entries: seedEntries('journaling', 27, 0.65, 1),
-    },
-    {
-      id: 'water', name: 'Enough Water', icon: '💧', color: '#38bdf8',
-      category: 'Health', target: 8, targetUnit: 'glasses',
-      schedule: [0,1,2,3,4,5,6], createdAt: Date.now() - 70*86400000,
-      entries: seedEntries('water', 43, 0.55, 8),
-    },
-    {
-      id: 'alcohol', name: 'No Alcohol', icon: '🚫', color: '#f43f5e',
-      category: 'Health', target: 1, targetUnit: 'day',
-      schedule: [0,1,2,3,4,5,6], createdAt: Date.now() - 120*86400000,
-      entries: seedEntries('alcohol', 61, 0.85, 1),
-    },
-    {
-      id: 'eating', name: 'Eating Habits', icon: '🥗', color: '#22c55e',
-      category: 'Health', target: 3, targetUnit: 'meals',
-      schedule: [0,1,2,3,4,5,6], createdAt: Date.now() - 60*86400000,
-      entries: seedEntries('eating', 79, 0.6, 3),
-    },
-    {
-      id: 'reading', name: 'Reading', icon: '📖', color: '#eab308',
-      category: 'Mind', target: 20, targetUnit: 'min',
-      schedule: [0,1,2,3,4,5,6], createdAt: Date.now() - 50*86400000,
-      entries: seedEntries('reading', 97, 0.4, 20),
-    },
-  ];
-}
-
+// ── initial state (first run: clean slate) ───────────────────────────────────
 function defaultState() {
   return {
-    habits: defaultHabits(),
-    widgets: [
-      { id: 'w1', type: 'grid',     size: '4x4', habitIds: null, accent: null, bg: 'dark', title: 'MyHabits' },
-      { id: 'w2', type: 'single',   size: '2x2', habitIds: ['gym'], accent: null, bg: 'dark' },
-      { id: 'w3', type: 'single',   size: '2x2', habitIds: ['alcohol'], accent: null, bg: 'dark' },
-    ],
+    habits: [],
+    widgets: [],
     settings: { accent: '#f97316', weekStart: 1 /* 1=Mon */ },
   };
 }
+
+// Old builds shipped demo habits/widgets with fixed IDs. Strip them on load
+// so users who installed early versions also get a clean slate without
+// touching any habits they created themselves (those use 'h_'-prefixed IDs).
+const LEGACY_SEED_HABIT_IDS = new Set(['gym', 'journaling', 'water', 'alcohol', 'eating', 'reading']);
+const LEGACY_SEED_WIDGET_IDS = new Set(['w1', 'w2', 'w3']);
 
 function loadState() {
   try {
@@ -144,7 +77,11 @@ function loadState() {
     if (!raw) return defaultState();
     const parsed = JSON.parse(raw);
     if (!parsed.habits) return defaultState();
-    return parsed;
+    return {
+      ...parsed,
+      habits: parsed.habits.filter((h) => !LEGACY_SEED_HABIT_IDS.has(h.id)),
+      widgets: (parsed.widgets || []).filter((w) => !LEGACY_SEED_WIDGET_IDS.has(w.id)),
+    };
   } catch {
     return defaultState();
   }
@@ -250,11 +187,8 @@ function StoreProvider({ children }) {
       setState((s) => ({ ...s, settings: { ...s.settings, ...patch } }));
     },
 
-    resetAll() {
-      setState(defaultState());
-    },
     wipeAll() {
-      setState({ ...defaultState(), habits: [], widgets: [] });
+      setState(defaultState());
     },
   }), [state]);
 

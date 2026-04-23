@@ -183,7 +183,8 @@ function BottomNav({ tab, onChange, accent }) {
   ];
   return (
     <div style={{
-      position: 'absolute', left: 12, right: 12, bottom: 22,
+      position: 'absolute', left: 12, right: 12,
+      bottom: 'calc(22px + env(safe-area-inset-bottom, 0px))',
       background: '#17181c', borderRadius: 22, border: '1px solid #222429',
       display: 'flex', padding: 6, boxShadow: '0 10px 30px rgba(0,0,0,0.5)', zIndex: 5,
     }}>

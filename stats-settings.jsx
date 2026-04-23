@@ -101,7 +101,7 @@ function StatCard({ label, value, unit, accent }) {
 }
 
 function SettingsScreen() {
-  const { state, updateSettings, resetAll, wipeAll } = useStore();
+  const { state, updateSettings, wipeAll } = useStore();
   const accent = state.settings.accent;
   return (
     <div style={{ background: '#0b0c0e', minHeight: '100%', paddingBottom: 110 }}>
@@ -143,9 +143,6 @@ function SettingsScreen() {
             Data
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <GhostButton full onClick={() => {
-              if (confirm('Reset to sample data? Your current habits and widgets will be replaced.')) resetAll();
-            }}>Reset to sample data</GhostButton>
             <button onClick={() => {
               if (confirm('Delete ALL habits and widgets? This cannot be undone.')) wipeAll();
             }} style={{
