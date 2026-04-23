@@ -48,7 +48,9 @@ function AppInner({ tab, setTab, modal, setModal }) {
 
   const inner = (
     <div style={{ position: 'relative', width: '100%', height: '100%', background: '#0b0c0e', overflow: 'hidden' }}>
-      {content}
+      <div style={{ position: 'absolute', inset: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
+        {content}
+      </div>
       <BottomNav tab={tab} onChange={setTab} accent={accent}/>
 
       {modal && (
@@ -56,6 +58,7 @@ function AppInner({ tab, setTab, modal, setModal }) {
           position: 'absolute', inset: 0, zIndex: 10,
           background: '#0b0c0e',
           animation: 'slideUp 240ms cubic-bezier(.2,.8,.2,1)',
+          overflowY: 'auto', WebkitOverflowScrolling: 'touch',
         }}>
           {modal.kind === 'newHabit' && (
             <HabitEditor
