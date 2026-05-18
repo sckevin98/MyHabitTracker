@@ -1,5 +1,17 @@
 // MyHabits — Habit detail screen
 
+function HeatmapScroller(props) {
+  const ref = React.useRef(null);
+  React.useEffect(() => {
+    if (ref.current) ref.current.scrollLeft = ref.current.scrollWidth;
+  }, [props.habit && props.habit.id, props.weeks]);
+  return (
+    <div ref={ref} style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+      <Heatmap {...props}/>
+    </div>
+  );
+}
+
 function HabitDetail({ habitId, onBack, onEdit }) {
   const { state, setEntry, checkIn } = useStore();
   const habit = state.habits.find((h) => h.id === habitId);
@@ -101,7 +113,7 @@ function HabitDetail({ habitId, onBack, onEdit }) {
           background: '#17181c', border: '1px solid #222429', borderRadius: 20, padding: 16, marginBottom: 16,
         }}>
           <div style={{ color: '#f3f4f6', fontSize: 13, fontWeight: 600, marginBottom: 12 }}>History</div>
-          <Heatmap habit={habit} weeks={22} cellSize={11} gap={3} rounded={2}/>
+          <HeatmapScroller habit={habit} weeks={78} cellSize={11} gap={3} rounded={2}/>
         </div>
 
         {/* Calendar */}

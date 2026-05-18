@@ -1,62 +1,8 @@
-// MyHabits — state store: localStorage-backed habits + completions
-// Exposes: useStore() hook and a pure API for components to use.
+// MyHabits — React state store: localStorage persistence + provider/hook.
+// All pure helpers live in lib.js (which must be loaded before this file).
 
 const STORAGE_KEY = 'myhabits.v1';
 
-const COLORS = [
-  { name: 'Orange', value: '#f97316' },
-  { name: 'Amber',  value: '#eab308' },
-  { name: 'Green',  value: '#22c55e' },
-  { name: 'Teal',   value: '#14b8a6' },
-  { name: 'Cyan',   value: '#38bdf8' },
-  { name: 'Indigo', value: '#6366f1' },
-  { name: 'Purple', value: '#a855f7' },
-  { name: 'Pink',   value: '#ec4899' },
-  { name: 'Rose',   value: '#f43f5e' },
-  { name: 'Lime',   value: '#84cc16' },
-  { name: 'Slate',  value: '#94a3b8' },
-  { name: 'Red',    value: '#ef4444' },
-];
-
-const ICONS = [
-  '🏋','🏃','🚴','🧘','⚽','🏊','🥾',
-  '📖','📚','✍','📓','🎓','🧠',
-  '💧','🥗','🥦','🍎','🥛','🍵','☕',
-  '🚫','🧼','🛁','💊','😴','🌙','☀',
-  '🎨','🎸','🎹','🎧','📷','🎮','🎲',
-  '💰','💼','📈','📱','💻','🧹','🌱',
-];
-
-const CATEGORIES = ['Health','Fitness','Mind','Work','Other'];
-
-const WEEKDAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-
-// ── date helpers ─────────────────────────────────────────────────────────────
-function todayKey() {
-  const d = new Date();
-  return dateKey(d);
-}
-function dateKey(d) {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${y}-${m}-${day}`;
-}
-function keyToDate(k) {
-  const [y, m, d] = k.split('-').map(Number);
-  return new Date(y, m - 1, d);
-}
-function addDays(d, n) {
-  const x = new Date(d);
-  x.setDate(x.getDate() + n);
-  return x;
-}
-function weekdayIndex(d) {
-  // Mon=0..Sun=6
-  return (d.getDay() + 6) % 7;
-}
-
-// ── initial state (first run: clean slate) ───────────────────────────────────
 function defaultState() {
   return {
     habits: [],
@@ -91,7 +37,6 @@ function saveState(s) {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); } catch {}
 }
 
-// ── store hook ───────────────────────────────────────────────────────────────
 const StoreContext = React.createContext(null);
 
 function StoreProvider({ children }) {
@@ -190,6 +135,43 @@ function StoreProvider({ children }) {
     wipeAll() {
       setState(defaultState());
     },
+
+    // backup / restore
+    exportJson() {
+      return JSON.stringify(state, null, 2);
+    },
+    importJson(text) {
+      const parsed = JSON.parse(text);
+      if (!parsed || typeof parsed !== 'object') {
+        throw new Error('JSON is not an object');
+      }
+      if (isNativeBackup(parsed)) {
+        const next = {
+          habits: parsed.habits,
+          widgets: Array.isArray(parsed.widgets) ? parsed.widgets : [],
+          settings: { ...defaultState().settings, ...(parsed.settings || {}) },
+        };
+        setState(next);
+        return { source: 'native', habits: next.habits.length, widgets: next.widgets.length };
+      }
+      const imported = parseHabitKit(parsed);
+      const entryCount = imported.reduce((n, h) => n + Object.keys(h.entries).length, 0);
+      const all = imported.flatMap((h) => Object.keys(h.entries));
+      const earliest = all.length ? all.reduce((a, b) => a < b ? a : b) : null;
+      const latest   = all.length ? all.reduce((a, b) => a > b ? a : b) : null;
+      setState((s) => ({ ...s, habits: [...s.habits, ...imported] }));
+      return { source: 'habitkit', habits: imported.length, entries: entryCount, earliest, latest };
+    },
+    importCsv(text) {
+      const parsed = parseCsv(text);
+      setState((s) => mergeCsvImport(s, parsed));
+      return {
+        habits: parsed.columns.length,
+        entries: parsed.columns.reduce((n, c) => n + Object.keys(c.entries).length, 0),
+        earliest: parsed.earliest,
+        latest: parsed.latest,
+      };
+    },
   }), [state]);
 
   return <StoreContext.Provider value={api}>{children}</StoreContext.Provider>;
@@ -199,58 +181,4 @@ function useStore() {
   return React.useContext(StoreContext);
 }
 
-// ── derived stats ────────────────────────────────────────────────────────────
-function computeStreak(habit) {
-  // count consecutive "fulfilled" days up to (and including) today, respecting schedule
-  let streak = 0;
-  let d = new Date();
-  // Don't count today if not yet fulfilled — start from today if fulfilled, else yesterday
-  const todayFulfilled = (habit.entries[dateKey(d)] || 0) >= habit.target;
-  if (!todayFulfilled) d = addDays(d, -1);
-
-  while (true) {
-    const scheduled = habit.schedule.includes(weekdayIndex(d));
-    const key = dateKey(d);
-    const done = (habit.entries[key] || 0) >= habit.target;
-    if (scheduled) {
-      if (done) streak++;
-      else break;
-    }
-    d = addDays(d, -1);
-    // safety cutoff
-    if (streak > 3650) break;
-  }
-  return streak;
-}
-
-function completionLevel(habit, dateKeyStr) {
-  const v = habit.entries[dateKeyStr] || 0;
-  if (!v) return 0;
-  const pct = v / habit.target;
-  if (pct >= 1) return 4;
-  if (pct >= 0.66) return 3;
-  if (pct >= 0.33) return 2;
-  return 1;
-}
-
-function completionRatio(habit, dateKeyStr) {
-  const v = habit.entries[dateKeyStr] || 0;
-  return Math.min(1, v / habit.target);
-}
-
-function daysCompleted(habit, n = 30) {
-  let count = 0;
-  const today = new Date();
-  for (let i = 0; i < n; i++) {
-    const k = dateKey(addDays(today, -i));
-    if ((habit.entries[k] || 0) >= habit.target) count++;
-  }
-  return count;
-}
-
-Object.assign(window, {
-  StoreProvider, useStore,
-  COLORS, ICONS, CATEGORIES, WEEKDAYS,
-  todayKey, dateKey, keyToDate, addDays, weekdayIndex,
-  computeStreak, completionLevel, completionRatio, daysCompleted,
-});
+Object.assign(window, { StoreProvider, useStore });

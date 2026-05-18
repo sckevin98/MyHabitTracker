@@ -1,0 +1,10 @@
+{
+  "name": "myhabits",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Static habit-tracker PWA. No build step. Tests run the pure helpers in lib.js via Node's built-in test runner.",
+  "scripts": {
+    "test": "node --test tests/dates.test.js tests/csv.test.js tests/habitkit.test.js",
+    "check": "node --check lib.js && node -e \"require('./lib.js'); console.log('lib.js loads OK')\""
+  }
+}

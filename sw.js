@@ -1,6 +1,6 @@
 // MyHabits service worker — offline-first cache
 // Bump CACHE_VERSION to force clients to pick up new files.
-const CACHE_VERSION = 'v4';
+const CACHE_VERSION = 'v5';
 const CACHE_NAME = `myhabits-${CACHE_VERSION}`;
 
 // Same-origin assets to pre-cache on install.
@@ -10,6 +10,7 @@ const APP_SHELL = [
   './manifest.webmanifest',
   './icon.svg',
   './icon-maskable.svg',
+  './lib.js',
   './android-frame.jsx',
   './store.jsx',
   './ui.jsx',

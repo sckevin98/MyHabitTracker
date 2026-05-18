@@ -1,0 +1,6 @@
+# Personal HabitKit export used as a test fixture — contains private data.
+habitkit_export.json
+
+# Node test runner output / local
+node_modules/
+.DS_Store

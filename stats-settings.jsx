@@ -101,8 +101,60 @@ function StatCard({ label, value, unit, accent }) {
 }
 
 function SettingsScreen() {
-  const { state, updateSettings, wipeAll } = useStore();
+  const { state, updateSettings, wipeAll, exportJson, importJson, importCsv } = useStore();
   const accent = state.settings.accent;
+  const fileRef = React.useRef(null);
+  const [importMsg, setImportMsg] = React.useState(null);
+
+  const doExport = () => {
+    const blob = new Blob([exportJson()], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `myhabits-backup-${todayKey()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  };
+
+  const doImport = async (file) => {
+    if (!file) return;
+    setImportMsg(null);
+    try {
+      const text = await file.text();
+      const looksJson = text.trim().startsWith('{');
+      if (looksJson) {
+        const parsed = JSON.parse(text);
+        if (parsed && Array.isArray(parsed.habits) && parsed.habits[0] &&
+            typeof parsed.habits[0].entries === 'object' && !Array.isArray(parsed.habits[0].entries)) {
+          if (!confirm('Replace ALL current habits, widgets, and settings with this backup?')) return;
+        } else {
+          if (!confirm('Import habits and history from this file? They will be added to your current habits.')) return;
+        }
+        const r = importJson(text);
+        if (r.source === 'native') {
+          setImportMsg(`Restored ${r.habits} habit${r.habits === 1 ? '' : 's'} and ${r.widgets} widget${r.widgets === 1 ? '' : 's'}.`);
+        } else {
+          setImportMsg(`Imported ${r.habits} habit${r.habits === 1 ? '' : 's'} · ${r.entries} day${r.entries === 1 ? '' : 's'}${r.earliest ? ` (${r.earliest} → ${r.latest})` : ''}.`);
+        }
+      } else {
+        const preview = parseCsv(text);
+        if (!preview.columns.length) throw new Error('No habit data found in CSV');
+        const total = preview.columns.reduce((n, c) => n + Object.keys(c.entries).length, 0);
+        const ok = confirm(
+          `Import ${preview.columns.length} habit${preview.columns.length === 1 ? '' : 's'} and ${total} check-in${total === 1 ? '' : 's'} ` +
+          `(${preview.earliest} → ${preview.latest})?\n\n` +
+          `Existing habits with matching names are merged; others are added.`
+        );
+        if (!ok) return;
+        const r = importCsv(text);
+        setImportMsg(`Imported ${r.habits} habit column${r.habits === 1 ? '' : 's'} · ${r.entries} day${r.entries === 1 ? '' : 's'} (${r.earliest} → ${r.latest}).`);
+      }
+    } catch (err) {
+      setImportMsg(`Import failed: ${err.message || err}`);
+    }
+  };
   return (
     <div style={{ background: '#0b0c0e', minHeight: '100%', paddingBottom: 110 }}>
       <div style={{ padding: '14px 16px 12px' }}>
@@ -143,12 +195,44 @@ function SettingsScreen() {
             Data
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <button onClick={doExport} style={{
+              background: 'transparent', border: '1px solid #2a2c33', color: '#e5e7eb',
+              padding: '12px', borderRadius: 14, fontSize: 14, fontWeight: 600,
+              cursor: 'pointer', fontFamily: 'inherit',
+            }}>Export backup (.json)</button>
+
+            <button onClick={() => fileRef.current && fileRef.current.click()} style={{
+              background: 'transparent', border: '1px solid #2a2c33', color: '#e5e7eb',
+              padding: '12px', borderRadius: 14, fontSize: 14, fontWeight: 600,
+              cursor: 'pointer', fontFamily: 'inherit',
+            }}>Import data (.json or .csv)</button>
+            <input
+              ref={fileRef}
+              type="file"
+              accept=".json,.csv,application/json,text/csv,text/plain"
+              style={{ display: 'none' }}
+              onChange={(e) => {
+                const f = e.target.files && e.target.files[0];
+                e.target.value = '';
+                doImport(f);
+              }}
+            />
+            {importMsg && (
+              <div style={{ color: '#8a8d95', fontSize: 11, lineHeight: 1.4, padding: '2px 4px' }}>
+                {importMsg}
+              </div>
+            )}
+            <div style={{ color: '#6b6e76', fontSize: 11, lineHeight: 1.4, padding: '2px 4px' }}>
+              Supports MyHabits backups (replaces data), HabitKit exports (adds to existing habits),
+              and CSV (first column <code>Date</code> in YYYY-MM-DD, other columns are habit names).
+            </div>
+
             <button onClick={() => {
               if (confirm('Delete ALL habits and widgets? This cannot be undone.')) wipeAll();
             }} style={{
               background: 'transparent', border: '1px solid #3a1f24', color: '#f87171',
               padding: '12px', borderRadius: 14, fontSize: 14, fontWeight: 600,
-              cursor: 'pointer', fontFamily: 'inherit',
+              cursor: 'pointer', fontFamily: 'inherit', marginTop: 4,
             }}>Wipe everything</button>
           </div>
         </div>
