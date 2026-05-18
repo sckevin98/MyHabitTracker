@@ -60,20 +60,26 @@ jobs:
           path: ${{ steps.apk.outputs.path }}
           retention-days: 30
 
-      # On main, also publish to a rolling pre-release so the APK has a stable URL
-      # you can open straight from your phone.
+      # On main, publish a rolling pre-release so the APK has a stable URL.
+      # We delete-and-recreate (instead of updating in place) so the "published"
+      # timestamp + the release name reflect the current build, not the first one.
       - name: Publish rolling release
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: latest
-          name: Latest debug APK
-          prerelease: true
-          files: ${{ steps.apk.outputs.path }}
-          body: |
-            Latest debug build from `main` (commit ${{ github.sha }}).
-
-            Install on your phone: download `app-debug.apk`, open it from the
-            Files app, allow "Install from unknown sources" if prompted.
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          DATE=$(date -u +"%Y-%m-%d %H:%M UTC")
+          NAME="Build $SHORT_SHA · $DATE"
+
+          # Remove the previous release with the same tag so the timestamp updates.
+          gh release delete latest --yes --cleanup-tag || true
+
+          gh release create latest \
+            --prerelease \
+            --title "$NAME" \
+            --notes "Latest debug build from \`main\` (commit \`${{ github.sha }}\`).
+
+          Install on your phone: download \`app-debug.apk\`, open it from the
+          Files app, allow \"Install from unknown sources\" if prompted." \
+            "${{ steps.apk.outputs.path }}"
