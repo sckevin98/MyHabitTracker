@@ -30,8 +30,13 @@ class MainActivity : AppCompatActivity() {
         // Serve files in src/main/assets/web/ at https://appassets.androidplatform.net/web/
         // so the page runs as a same-origin HTTPS document. file:// would block
         // Babel-Standalone's fetch of the .jsx files and leave the screen black.
+        //
+        // Note: AssetsPathHandler opens its path argument directly under assets/.
+        // We match the entire "/" prefix and let the path (e.g. "web/index.html")
+        // resolve to assets/web/index.html. Matching "/web/" would strip the prefix
+        // and look for assets/index.html, which is NOT where our bundle lives.
         val assetLoader = WebViewAssetLoader.Builder()
-            .addPathHandler("/web/", WebViewAssetLoader.AssetsPathHandler(this))
+            .addPathHandler("/", WebViewAssetLoader.AssetsPathHandler(this))
             .build()
 
         webView = WebView(this).apply {
