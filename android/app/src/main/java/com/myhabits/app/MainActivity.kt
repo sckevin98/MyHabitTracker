@@ -1,17 +1,23 @@
 package com.myhabits.app
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.WindowInsetsController
 import android.webkit.ConsoleMessage
+import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.webkit.WebViewAssetLoader
 
@@ -19,22 +25,34 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var webView: WebView
 
+    // Holds the WebView's "give me file URIs" callback while the system file
+    // picker is open; resolved by the launcher below.
+    private var fileChooserCallback: ValueCallback<Array<Uri>>? = null
+
+    private val fileChooserLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val cb = fileChooserCallback
+        fileChooserCallback = null
+        if (cb == null) return@registerForActivityResult
+        val uris: Array<Uri>? = if (result.resultCode == Activity.RESULT_OK) {
+            val data = result.data
+            val clip = data?.clipData
+            when {
+                clip != null -> Array(clip.itemCount) { clip.getItemAt(it).uri }
+                data?.data != null -> arrayOf(data.data!!)
+                else -> null
+            }
+        } else null
+        cb.onReceiveValue(uris)
+    }
+
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Lets you debug a running APK from your laptop via chrome://inspect.
-        // Cheap to leave on for our personal-use app.
         WebView.setWebContentsDebuggingEnabled(true)
 
-        // Serve files in src/main/assets/web/ at https://appassets.androidplatform.net/web/
-        // so the page runs as a same-origin HTTPS document. file:// would block
-        // Babel-Standalone's fetch of the .jsx files and leave the screen black.
-        //
-        // Note: AssetsPathHandler opens its path argument directly under assets/.
-        // We match the entire "/" prefix and let the path (e.g. "web/index.html")
-        // resolve to assets/web/index.html. Matching "/web/" would strip the prefix
-        // and look for assets/index.html, which is NOT where our bundle lives.
         val assetLoader = WebViewAssetLoader.Builder()
             .addPathHandler("/", WebViewAssetLoader.AssetsPathHandler(this))
             .build()
@@ -56,8 +74,6 @@ class MainActivity : AppCompatActivity() {
                 ): WebResourceResponse? = assetLoader.shouldInterceptRequest(request.url)
             }
 
-            // Forward console.log / console.error from the page to Android Logcat
-            // so we can see what's happening from `adb logcat` if anything else breaks.
             webChromeClient = object : WebChromeClient() {
                 override fun onConsoleMessage(msg: ConsoleMessage): Boolean {
                     android.util.Log.d(
@@ -66,11 +82,33 @@ class MainActivity : AppCompatActivity() {
                     )
                     return true
                 }
+
+                // Without this override, <input type="file"> taps in WebView do
+                // nothing — which is why Import was silently broken.
+                override fun onShowFileChooser(
+                    view: WebView,
+                    filePathCallback: ValueCallback<Array<Uri>>,
+                    fileChooserParams: FileChooserParams,
+                ): Boolean {
+                    fileChooserCallback?.onReceiveValue(null)
+                    fileChooserCallback = filePathCallback
+                    return try {
+                        val intent = fileChooserParams.createIntent().apply {
+                            // The web page passes accept=".json,.csv,..." through to here.
+                            // ACTION_GET_CONTENT works for any system file picker.
+                            addCategory(Intent.CATEGORY_OPENABLE)
+                        }
+                        fileChooserLauncher.launch(intent)
+                        true
+                    } catch (_: ActivityNotFoundException) {
+                        fileChooserCallback = null
+                        false
+                    }
+                }
             }
         }
         setContentView(webView)
 
-        // Match the dark theme on the system bars.
         window.statusBarColor = 0xFF0B0C0E.toInt()
         window.navigationBarColor = 0xFF0B0C0E.toInt()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {

@@ -54,5 +54,47 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_single_info" />
         </receiver>
+
+        <!-- 4×2 / 4×4 Heatmap widget (one habit) -->
+        <receiver
+            android:name=".HeatmapWidget"
+            android:exported="true"
+            android:label="@string/widget_heatmap_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.myhabits.app.REFRESH_WIDGETS" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_heatmap_info" />
+        </receiver>
+
+        <!-- 4×4 grid of all habits -->
+        <receiver
+            android:name=".AllHabitsWidget"
+            android:exported="true"
+            android:label="@string/widget_all_habits_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.myhabits.app.REFRESH_WIDGETS" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_all_habits_info" />
+        </receiver>
+
+        <!-- 4×2 top-streaks row -->
+        <receiver
+            android:name=".StreaksWidget"
+            android:exported="true"
+            android:label="@string/widget_streaks_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.myhabits.app.REFRESH_WIDGETS" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_streaks_info" />
+        </receiver>
     </application>
 </manifest>

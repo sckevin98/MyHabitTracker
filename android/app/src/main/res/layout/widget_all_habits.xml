@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/allhabits_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="10dp"
+    android:background="#17181c">
+
+    <!-- Row 0 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <LinearLayout android:id="@+id/cell0" style="@style/WidgetCell">
+            <LinearLayout style="@style/WidgetCellTop">
+                <TextView android:id="@+id/cell0_icon" style="@style/WidgetCellIcon" android:text="🌱"/>
+                <TextView android:id="@+id/cell0_status" style="@style/WidgetCellStatus" android:text="—"/>
+            </LinearLayout>
+            <TextView android:id="@+id/cell0_name" style="@style/WidgetCellName" android:text="Habit"/>
+            <ProgressBar android:id="@+id/cell0_bar" style="@style/WidgetCellBar"/>
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/cell1" style="@style/WidgetCell">
+            <LinearLayout style="@style/WidgetCellTop">
+                <TextView android:id="@+id/cell1_icon" style="@style/WidgetCellIcon" android:text="🌱"/>
+                <TextView android:id="@+id/cell1_status" style="@style/WidgetCellStatus" android:text="—"/>
+            </LinearLayout>
+            <TextView android:id="@+id/cell1_name" style="@style/WidgetCellName" android:text="Habit"/>
+            <ProgressBar android:id="@+id/cell1_bar" style="@style/WidgetCellBar"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Row 1 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <LinearLayout android:id="@+id/cell2" style="@style/WidgetCell">
+            <LinearLayout style="@style/WidgetCellTop">
+                <TextView android:id="@+id/cell2_icon" style="@style/WidgetCellIcon" android:text="🌱"/>
+                <TextView android:id="@+id/cell2_status" style="@style/WidgetCellStatus" android:text="—"/>
+            </LinearLayout>
+            <TextView android:id="@+id/cell2_name" style="@style/WidgetCellName" android:text="Habit"/>
+            <ProgressBar android:id="@+id/cell2_bar" style="@style/WidgetCellBar"/>
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/cell3" style="@style/WidgetCell">
+            <LinearLayout style="@style/WidgetCellTop">
+                <TextView android:id="@+id/cell3_icon" style="@style/WidgetCellIcon" android:text="🌱"/>
+                <TextView android:id="@+id/cell3_status" style="@style/WidgetCellStatus" android:text="—"/>
+            </LinearLayout>
+            <TextView android:id="@+id/cell3_name" style="@style/WidgetCellName" android:text="Habit"/>
+            <ProgressBar android:id="@+id/cell3_bar" style="@style/WidgetCellBar"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Row 2 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <LinearLayout android:id="@+id/cell4" style="@style/WidgetCell">
+            <LinearLayout style="@style/WidgetCellTop">
+                <TextView android:id="@+id/cell4_icon" style="@style/WidgetCellIcon" android:text="🌱"/>
+                <TextView android:id="@+id/cell4_status" style="@style/WidgetCellStatus" android:text="—"/>
+            </LinearLayout>
+            <TextView android:id="@+id/cell4_name" style="@style/WidgetCellName" android:text="Habit"/>
+            <ProgressBar android:id="@+id/cell4_bar" style="@style/WidgetCellBar"/>
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/cell5" style="@style/WidgetCell">
+            <LinearLayout style="@style/WidgetCellTop">
+                <TextView android:id="@+id/cell5_icon" style="@style/WidgetCellIcon" android:text="🌱"/>
+                <TextView android:id="@+id/cell5_status" style="@style/WidgetCellStatus" android:text="—"/>
+            </LinearLayout>
+            <TextView android:id="@+id/cell5_name" style="@style/WidgetCellName" android:text="Habit"/>
+            <ProgressBar android:id="@+id/cell5_bar" style="@style/WidgetCellBar"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Row 3 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <LinearLayout android:id="@+id/cell6" style="@style/WidgetCell">
+            <LinearLayout style="@style/WidgetCellTop">
+                <TextView android:id="@+id/cell6_icon" style="@style/WidgetCellIcon" android:text="🌱"/>
+                <TextView android:id="@+id/cell6_status" style="@style/WidgetCellStatus" android:text="—"/>
+            </LinearLayout>
+            <TextView android:id="@+id/cell6_name" style="@style/WidgetCellName" android:text="Habit"/>
+            <ProgressBar android:id="@+id/cell6_bar" style="@style/WidgetCellBar"/>
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/cell7" style="@style/WidgetCell">
+            <LinearLayout style="@style/WidgetCellTop">
+                <TextView android:id="@+id/cell7_icon" style="@style/WidgetCellIcon" android:text="🌱"/>
+                <TextView android:id="@+id/cell7_status" style="@style/WidgetCellStatus" android:text="—"/>
+            </LinearLayout>
+            <TextView android:id="@+id/cell7_name" style="@style/WidgetCellName" android:text="Habit"/>
+            <ProgressBar android:id="@+id/cell7_bar" style="@style/WidgetCellBar"/>
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

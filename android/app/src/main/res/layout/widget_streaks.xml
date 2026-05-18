@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/streaks_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:background="#17181c">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        android:textAllCaps="true"
+        android:textColor="#8a8d95"
+        android:letterSpacing="0.1"
+        android:text="@string/widget_streaks_header"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="6dp"
+        android:orientation="horizontal">
+
+        <LinearLayout android:id="@+id/streak0" style="@style/StreakSlot">
+            <TextView android:id="@+id/streak0_icon"   style="@style/StreakIcon"  android:text="🌱"/>
+            <TextView android:id="@+id/streak0_value"  style="@style/StreakValue" android:text="0"/>
+            <TextView android:id="@+id/streak0_name"   style="@style/StreakName"  android:text="—"/>
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/streak1" style="@style/StreakSlot">
+            <TextView android:id="@+id/streak1_icon"   style="@style/StreakIcon"  android:text="🌱"/>
+            <TextView android:id="@+id/streak1_value"  style="@style/StreakValue" android:text="0"/>
+            <TextView android:id="@+id/streak1_name"   style="@style/StreakName"  android:text="—"/>
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/streak2" style="@style/StreakSlot">
+            <TextView android:id="@+id/streak2_icon"   style="@style/StreakIcon"  android:text="🌱"/>
+            <TextView android:id="@+id/streak2_value"  style="@style/StreakValue" android:text="0"/>
+            <TextView android:id="@+id/streak2_name"   style="@style/StreakName"  android:text="—"/>
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/streak3" style="@style/StreakSlot">
+            <TextView android:id="@+id/streak3_icon"   style="@style/StreakIcon"  android:text="🌱"/>
+            <TextView android:id="@+id/streak3_value"  style="@style/StreakValue" android:text="0"/>
+            <TextView android:id="@+id/streak3_name"   style="@style/StreakName"  android:text="—"/>
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

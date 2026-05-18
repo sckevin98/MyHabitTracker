@@ -5,7 +5,6 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.graphics.Color
 import android.widget.RemoteViews
 
@@ -32,16 +31,12 @@ class SingleHabitWidget : AppWidgetProvider() {
     }
 
     override fun onDeleted(ctx: Context, ids: IntArray) {
-        val prefs = configPrefs(ctx)
-        prefs.edit().apply {
-            ids.forEach { remove(habitKey(it)) }
-            apply()
-        }
+        WidgetConfig.forget(ctx, ids)
     }
 
     private fun render(ctx: Context, mgr: AppWidgetManager, widgetId: Int) {
         val views = RemoteViews(ctx.packageName, R.layout.widget_single)
-        val habitId = configPrefs(ctx).getString(habitKey(widgetId), null)
+        val habitId = WidgetConfig.getHabit(ctx, widgetId)
         val state = HabitStore(ctx).readState()
         val habit = state?.habits?.firstOrNull { it.id == habitId }
 
@@ -91,12 +86,5 @@ class SingleHabitWidget : AppWidgetProvider() {
         views.setOnClickPendingIntent(R.id.widget_root, pi)
 
         mgr.updateAppWidget(widgetId, views)
-    }
-
-    companion object {
-        const val PREFS = "widget_config"
-        fun configPrefs(ctx: Context): SharedPreferences =
-            ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-        fun habitKey(widgetId: Int) = "habit_for_$widgetId"
     }
 }

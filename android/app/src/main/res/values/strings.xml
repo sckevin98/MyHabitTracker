@@ -4,6 +4,13 @@
 
     <string name="widget_single_label">MyHabits — Single habit</string>
     <string name="widget_single_description">Track one habit on your home screen.</string>
+    <string name="widget_heatmap_label">MyHabits — Heatmap</string>
+    <string name="widget_heatmap_description">GitHub-style history grid for one habit.</string>
+    <string name="widget_all_habits_label">MyHabits — All habits</string>
+    <string name="widget_all_habits_description">Grid of every habit with today\'s status.</string>
+    <string name="widget_streaks_label">MyHabits — Top streaks</string>
+    <string name="widget_streaks_description">Top 4 habits by current streak.</string>
+    <string name="widget_streaks_header">Top streaks</string>
     <string name="widget_pick_habit">Tap to pick a habit</string>
     <string name="widget_done_today">Done today</string>
     <string name="widget_not_done_today">Not done today</string>

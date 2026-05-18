@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="320dp"
+    android:minHeight="160dp"
+    android:targetCellWidth="4"
+    android:targetCellHeight="2"
+    android:minResizeWidth="280dp"
+    android:minResizeHeight="120dp"
+    android:maxResizeWidth="400dp"
+    android:maxResizeHeight="320dp"
+    android:updatePeriodMillis="1800000"
+    android:initialLayout="@layout/widget_heatmap"
+    android:configure="com.myhabits.app.HabitPickerActivity"
+    android:resizeMode="horizontal|vertical"
+    android:widgetCategory="home_screen"
+    android:previewLayout="@layout/widget_heatmap"
+    android:description="@string/widget_heatmap_description" />

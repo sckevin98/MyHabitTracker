@@ -73,18 +73,18 @@ class HabitPickerActivity : AppCompatActivity() {
     }
 
     private fun pick(habitId: String) {
-        SingleHabitWidget.configPrefs(this)
-            .edit()
-            .putString(SingleHabitWidget.habitKey(widgetId), habitId)
-            .apply()
+        WidgetConfig.setHabit(this, widgetId, habitId)
 
-        // Force the widget to redraw with the new habit.
+        // Ask the launcher to redraw whichever widget class owns this id.
         val mgr = AppWidgetManager.getInstance(this)
-        val intent = Intent(this, SingleHabitWidget::class.java).apply {
-            action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-            putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, intArrayOf(widgetId))
+        val provider = mgr.getAppWidgetInfo(widgetId)?.provider
+        if (provider != null) {
+            val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE).apply {
+                component = provider
+                putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, intArrayOf(widgetId))
+            }
+            sendBroadcast(intent)
         }
-        sendBroadcast(intent)
 
         val result = Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
         setResult(Activity.RESULT_OK, result)
