@@ -26,7 +26,7 @@ function useIsPhoneViewport() {
 
 function App() {
   const [tab, setTab] = useState('today');
-  const [modal, setModal] = useState(null); // { kind: 'newHabit' | 'editHabit' | 'detail' | 'newWidget' | 'editWidget', id?: string }
+  const [modal, setModal] = useState(null); // { kind: 'newHabit' | 'editHabit' | 'detail', id?: string }
 
   return (
     <StoreProvider>
@@ -43,7 +43,6 @@ function AppInner({ tab, setTab, modal, setModal }) {
   let content;
   if (tab === 'today')     content = <TodayScreen onNewHabit={() => setModal({ kind: 'newHabit' })} onOpenHabit={(id) => setModal({ kind: 'detail', id })}/>;
   else if (tab === 'stats')    content = <StatsScreen/>;
-  else if (tab === 'widgets')  content = <WidgetsScreen onOpen={(id) => setModal({ kind: 'editWidget', id })} onNew={() => setModal({ kind: 'newWidget' })}/>;
   else if (tab === 'settings') content = <SettingsScreen/>;
 
   const inner = (
@@ -82,12 +81,6 @@ function AppInner({ tab, setTab, modal, setModal }) {
             <HabitDetail habitId={modal.id}
               onBack={() => setModal(null)}
               onEdit={() => setModal({ kind: 'editHabit', id: modal.id })}/>
-          )}
-          {modal.kind === 'newWidget' && (
-            <WidgetStudio onClose={() => setModal(null)}/>
-          )}
-          {modal.kind === 'editWidget' && (
-            <WidgetStudio widgetId={modal.id} onClose={() => setModal(null)}/>
           )}
         </div>
       )}

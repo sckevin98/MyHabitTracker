@@ -6,16 +6,14 @@ const STORAGE_KEY = 'myhabits.v1';
 function defaultState() {
   return {
     habits: [],
-    widgets: [],
     settings: { accent: '#f97316', weekStart: 1 /* 1=Mon */ },
   };
 }
 
-// Old builds shipped demo habits/widgets with fixed IDs. Strip them on load
-// so users who installed early versions also get a clean slate without
-// touching any habits they created themselves (those use 'h_'-prefixed IDs).
+// Old builds shipped demo habits with fixed IDs. Strip them on load so users
+// who installed early versions also get a clean slate without touching any
+// habits they created themselves (those use 'h_'-prefixed IDs).
 const LEGACY_SEED_HABIT_IDS = new Set(['gym', 'journaling', 'water', 'alcohol', 'eating', 'reading']);
-const LEGACY_SEED_WIDGET_IDS = new Set(['w1', 'w2', 'w3']);
 
 function loadState() {
   try {
@@ -32,9 +30,8 @@ function loadState() {
     const parsed = JSON.parse(raw);
     if (!parsed.habits) return defaultState();
     return {
-      ...parsed,
       habits: parsed.habits.filter((h) => !LEGACY_SEED_HABIT_IDS.has(h.id)),
-      widgets: (parsed.widgets || []).filter((w) => !LEGACY_SEED_WIDGET_IDS.has(w.id)),
+      settings: { ...defaultState().settings, ...(parsed.settings || {}) },
     };
   } catch {
     return defaultState();
@@ -83,10 +80,6 @@ function StoreProvider({ children }) {
       setState((s) => ({
         ...s,
         habits: s.habits.filter((h) => h.id !== id),
-        widgets: s.widgets.map((w) => ({
-          ...w,
-          habitIds: w.habitIds ? w.habitIds.filter((x) => x !== id) : w.habitIds,
-        })),
       }));
     },
     reorderHabits(ids) {
@@ -124,23 +117,6 @@ function StoreProvider({ children }) {
       }));
     },
 
-    // widgets
-    addWidget(w) {
-      setState((s) => ({
-        ...s,
-        widgets: [...s.widgets, { ...w, id: 'w_' + Math.random().toString(36).slice(2, 9) }],
-      }));
-    },
-    updateWidget(id, patch) {
-      setState((s) => ({
-        ...s,
-        widgets: s.widgets.map((w) => w.id === id ? { ...w, ...patch } : w),
-      }));
-    },
-    deleteWidget(id) {
-      setState((s) => ({ ...s, widgets: s.widgets.filter((w) => w.id !== id) }));
-    },
-
     // settings
     updateSettings(patch) {
       setState((s) => ({ ...s, settings: { ...s.settings, ...patch } }));
@@ -162,11 +138,10 @@ function StoreProvider({ children }) {
       if (isNativeBackup(parsed)) {
         const next = {
           habits: parsed.habits,
-          widgets: Array.isArray(parsed.widgets) ? parsed.widgets : [],
           settings: { ...defaultState().settings, ...(parsed.settings || {}) },
         };
         setState(next);
-        return { source: 'native', habits: next.habits.length, widgets: next.widgets.length };
+        return { source: 'native', habits: next.habits.length };
       }
       const imported = parseHabitKit(parsed);
       const entryCount = imported.reduce((n, h) => n + Object.keys(h.entries).length, 0);

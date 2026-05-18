@@ -178,7 +178,6 @@ function BottomNav({ tab, onChange, accent }) {
   const items = [
     { id: 'today', label: 'Today',    icon: 'Home' },
     { id: 'stats', label: 'Stats',    icon: 'Stats' },
-    { id: 'widgets', label: 'Widgets', icon: 'Widget' },
     { id: 'settings', label: 'Settings', icon: 'Settings' },
   ];
   return (

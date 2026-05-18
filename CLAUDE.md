@@ -31,7 +31,7 @@ There is no module bundler. Files are loaded as separate `<script>` tags from `i
 
 Load order in `index.html`:
 1. `lib.js` (plain JS, no JSX) — pure helpers + parsers, loaded first.
-2. `.jsx` files in order: `android-frame.jsx` → `store.jsx` → `ui.jsx` → `today.jsx` → `habit-editor.jsx` → `habit-detail.jsx` → `widgets.jsx` → `stats-settings.jsx` → `app.jsx`.
+2. `.jsx` files in order: `android-frame.jsx` → `store.jsx` → `ui.jsx` → `today.jsx` → `habit-editor.jsx` → `habit-detail.jsx` → `stats-settings.jsx` → `app.jsx`.
 
 `app.jsx` is the entrypoint that calls `ReactDOM.createRoot(...).render(<App/>)`.
 
@@ -59,19 +59,18 @@ That lets the browser keep using globals while Node tests `require('../lib.js')`
 
 ```
 { habits: [{ id, name, icon, color, category, target, targetUnit, schedule, entries: {YYYY-MM-DD: count}, createdAt }],
-  widgets: [{ id, type, size, bg, habitIds }],
   settings: { accent, weekStart } }
 ```
 
 - Persisted to `localStorage` under the key `myhabits.v1` on every state change.
-- First-run users get an empty state. Old builds shipped demo habits/widgets with fixed IDs; `loadState()` strips those on load (see `LEGACY_SEED_HABIT_IDS` / `LEGACY_SEED_WIDGET_IDS`). User-created habits use `h_`-prefixed IDs and are never touched.
+- First-run users get an empty state. Old builds shipped demo habits with fixed IDs; `loadState()` strips those on load (see `LEGACY_SEED_HABIT_IDS`). User-created habits use `h_`-prefixed IDs and are never touched.
 - Derived helpers (`computeStreak`, `completionLevel`, `completionRatio`, `daysCompleted`) are pure functions exported via `window` so any screen can import them.
 
 ### UI structure
 
-`app.jsx` owns tab state (`today` / `stats` / `widgets` / `settings`) and modal state. Modals are full-screen slide-up overlays for `newHabit` / `editHabit` / `detail` / `newWidget` / `editWidget`. On desktop the app is wrapped in a fake `AndroidDevice` frame (`android-frame.jsx`); on phones / installed PWAs (`useIsPhoneViewport`) it fills the screen. Detection uses `display-mode: standalone/fullscreen` media queries plus `max-width: 500px`.
+`app.jsx` owns tab state (`today` / `stats` / `settings`) and modal state. Modals are full-screen slide-up overlays for `newHabit` / `editHabit` / `detail`. On desktop the app is wrapped in a fake `AndroidDevice` frame (`android-frame.jsx`); on phones / installed PWAs (`useIsPhoneViewport`) it fills the screen. Detection uses `display-mode: standalone/fullscreen` media queries plus `max-width: 500px`.
 
-Screens roughly map 1:1 to files: `today.jsx`, `stats-settings.jsx` (Stats + Settings), `widgets.jsx` (gallery + Widget Studio), `habit-detail.jsx`, `habit-editor.jsx`. Shared primitives (icons, heatmap, buttons) live in `ui.jsx`.
+Screens roughly map 1:1 to files: `today.jsx`, `stats-settings.jsx` (Stats + Settings), `habit-detail.jsx`, `habit-editor.jsx`. Shared primitives (icons, heatmap, buttons) live in `ui.jsx`. Home-screen widgets are a separate concept implemented natively under `android/` — there is no in-app widget designer.
 
 ### Date model
 

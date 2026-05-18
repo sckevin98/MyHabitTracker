@@ -1,20 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Adaptive-icon foreground: an orange "M" check mark on a transparent
-     108dp background, with 18dp of safe-zone padding per spec. -->
+<!-- Adaptive-icon foreground: two-tone flame, sized to stay inside the inner
+     66dp safe circle of the 108x108 viewport (centre (54,54), radius 33). -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
 
+    <!-- Outer flame -->
     <path
-        android:fillColor="#f97316"
-        android:pathData="M30,30 L36,30 L54,60 L72,30 L78,30 L78,78 L72,78 L72,42 L57,66 L51,66 L36,42 L36,78 L30,78 Z" />
+        android:pathData="M 54 26
+            C 64 36, 76 48, 76 60
+            C 76 74, 66 84, 54 84
+            C 42 84, 32 74, 32 60
+            C 32 48, 44 36, 54 26 Z"
+        android:fillType="nonZero">
+        <aapt:attr xmlns:aapt="http://schemas.android.com/aapt" name="android:fillColor">
+            <gradient
+                android:startX="54" android:startY="26"
+                android:endX="54"   android:endY="84"
+                android:type="linear">
+                <item android:offset="0.0"  android:color="#fb923c"/>
+                <item android:offset="0.55" android:color="#f97316"/>
+                <item android:offset="1.0"  android:color="#c2410c"/>
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Inner highlight -->
     <path
-        android:strokeColor="#f97316"
-        android:strokeWidth="4"
-        android:strokeLineCap="round"
-        android:strokeLineJoin="round"
-        android:fillColor="#00000000"
-        android:pathData="M44,80 L52,88 L66,72" />
+        android:pathData="M 54 54
+            C 60 60, 66 66, 66 72
+            C 66 78, 60 82, 54 82
+            C 48 82, 42 78, 42 72
+            C 42 66, 48 60, 54 54 Z"
+        android:fillType="nonZero">
+        <aapt:attr xmlns:aapt="http://schemas.android.com/aapt" name="android:fillColor">
+            <gradient
+                android:startX="54" android:startY="54"
+                android:endX="54"   android:endY="82"
+                android:type="linear">
+                <item android:offset="0.0"  android:color="#fde68a"/>
+                <item android:offset="0.6"  android:color="#fbbf24"/>
+                <item android:offset="1.0"  android:color="#f59e0b"/>
+            </gradient>
+        </aapt:attr>
+    </path>
 </vector>

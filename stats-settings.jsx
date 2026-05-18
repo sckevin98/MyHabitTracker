@@ -128,13 +128,13 @@ function SettingsScreen() {
         const parsed = JSON.parse(text);
         if (parsed && Array.isArray(parsed.habits) && parsed.habits[0] &&
             typeof parsed.habits[0].entries === 'object' && !Array.isArray(parsed.habits[0].entries)) {
-          if (!confirm('Replace ALL current habits, widgets, and settings with this backup?')) return;
+          if (!confirm('Replace ALL current habits and settings with this backup?')) return;
         } else {
           if (!confirm('Import habits and history from this file? They will be added to your current habits.')) return;
         }
         const r = importJson(text);
         if (r.source === 'native') {
-          setImportMsg(`Restored ${r.habits} habit${r.habits === 1 ? '' : 's'} and ${r.widgets} widget${r.widgets === 1 ? '' : 's'}.`);
+          setImportMsg(`Restored ${r.habits} habit${r.habits === 1 ? '' : 's'}.`);
         } else {
           setImportMsg(`Imported ${r.habits} habit${r.habits === 1 ? '' : 's'} · ${r.entries} day${r.entries === 1 ? '' : 's'}${r.earliest ? ` (${r.earliest} → ${r.latest})` : ''}.`);
         }
@@ -228,7 +228,7 @@ function SettingsScreen() {
             </div>
 
             <button onClick={() => {
-              if (confirm('Delete ALL habits and widgets? This cannot be undone.')) wipeAll();
+              if (confirm('Delete ALL habits? This cannot be undone.')) wipeAll();
             }} style={{
               background: 'transparent', border: '1px solid #3a1f24', color: '#f87171',
               padding: '12px', borderRadius: 14, fontSize: 14, fontWeight: 600,
