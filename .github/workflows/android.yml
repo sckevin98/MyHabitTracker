@@ -1,0 +1,76 @@
+name: Android APK
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Web tests first — if these fail there's no point building an APK.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Run web tests
+        run: npm test
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('android/**/*.gradle*', 'android/**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Build debug APK
+        working-directory: android
+        run: |
+          gradle assembleDebug --no-daemon --stacktrace
+
+      - name: Locate APK
+        id: apk
+        run: |
+          APK=$(find android/app/build/outputs/apk -name "*.apk" | head -1)
+          echo "path=$APK" >> "$GITHUB_OUTPUT"
+          echo "Built: $APK"
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: myhabits-debug-apk
+          path: ${{ steps.apk.outputs.path }}
+          retention-days: 30
+
+      # On main, also publish to a rolling pre-release so the APK has a stable URL
+      # you can open straight from your phone.
+      - name: Publish rolling release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: Latest debug APK
+          prerelease: true
+          files: ${{ steps.apk.outputs.path }}
+          body: |
+            Latest debug build from `main` (commit ${{ github.sha }}).
+
+            Install on your phone: download `app-debug.apk`, open it from the
+            Files app, allow "Install from unknown sources" if prompted.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

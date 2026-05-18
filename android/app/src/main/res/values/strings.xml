@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MyHabits</string>
+
+    <string name="widget_single_label">MyHabits — Single habit</string>
+    <string name="widget_single_description">Track one habit on your home screen.</string>
+    <string name="widget_pick_habit">Tap to pick a habit</string>
+    <string name="widget_done_today">Done today</string>
+    <string name="widget_not_done_today">Not done today</string>
+
+    <string name="picker_title">Pick a habit</string>
+    <string name="picker_empty">Open MyHabits, create at least one habit, then try adding the widget again.</string>
+
+    <plurals name="day_streak">
+        <item quantity="one">%d day streak</item>
+        <item quantity="other">%d day streak</item>
+    </plurals>
+</resources>

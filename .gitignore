@@ -4,3 +4,14 @@ habitkit_export.json
 # Node test runner output / local
 node_modules/
 .DS_Store
+
+# Android build artifacts
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/.idea/
+android/*.iml
+android/app/*.iml
+# Generated and downloaded — recreated by `prepareWebAssets`
+android/app/src/main/assets/web/

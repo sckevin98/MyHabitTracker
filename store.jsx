@@ -19,7 +19,15 @@ const LEGACY_SEED_WIDGET_IDS = new Set(['w1', 'w2', 'w3']);
 
 function loadState() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    let raw = localStorage.getItem(STORAGE_KEY);
+    // Android shell: if localStorage is empty but the bridge has data
+    // (e.g. WebView was cleared but SharedPreferences survived), seed from there.
+    if (!raw && typeof window !== 'undefined' && window.MyHabitsBridge && window.MyHabitsBridge.getState) {
+      try {
+        const fromNative = window.MyHabitsBridge.getState();
+        if (fromNative) raw = fromNative;
+      } catch {}
+    }
     if (!raw) return defaultState();
     const parsed = JSON.parse(raw);
     if (!parsed.habits) return defaultState();
@@ -34,7 +42,13 @@ function loadState() {
 }
 
 function saveState(s) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); } catch {}
+  const json = JSON.stringify(s);
+  try { localStorage.setItem(STORAGE_KEY, json); } catch {}
+  // Android shell: also push to native SharedPreferences so widgets can read it.
+  // Absent in plain web — the conditional is a no-op there.
+  if (typeof window !== 'undefined' && window.MyHabitsBridge && window.MyHabitsBridge.saveState) {
+    try { window.MyHabitsBridge.saveState(json); } catch {}
+  }
 }
 
 const StoreContext = React.createContext(null);

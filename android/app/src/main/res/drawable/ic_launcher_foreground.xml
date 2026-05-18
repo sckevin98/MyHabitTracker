@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Adaptive-icon foreground: an orange "M" check mark on a transparent
+     108dp background, with 18dp of safe-zone padding per spec. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <path
+        android:fillColor="#f97316"
+        android:pathData="M30,30 L36,30 L54,60 L72,30 L78,30 L78,78 L72,78 L72,42 L57,66 L51,66 L36,42 L36,78 L30,78 Z" />
+    <path
+        android:strokeColor="#f97316"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:fillColor="#00000000"
+        android:pathData="M44,80 L52,88 L66,72" />
+</vector>
